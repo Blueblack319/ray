@@ -73,7 +73,7 @@ def iterate(dataset, label, batch_size, metrics, output_file=None):
     with open(output_file, "a+") as f:
         for label, tput in metrics.items():
             f.write(f"{label},{tput}\n")
-        f.write("imagenet2=================================\n")
+        f.write("baseline=================================\n")
 
 
 def build_torch_dataset(
@@ -426,9 +426,9 @@ def get_complete_transform(output_shape, kernel_size, s=1.0):
     rnd_gaussian_blur = RandomApply([gaussian_blur], p=0.5)
     to_tensor = ToTensor()
     image_transform = Compose([
+        to_tensor,
         rnd_crop,
         rnd_flip,
-        to_tensor,
         rnd_color_jitter,
         rnd_gray,
         rnd_gaussian_blur,
@@ -665,13 +665,13 @@ if __name__ == "__main__":
 
         # ray.data, with transform.
         # Using torch Compose
-        # ray_dataset = ray.data.read_images(args.data_root, mode="RGB").map_batches(
-        #    transformImage
-        # )
-
-        ray_dataset = ray.data.read_images(args.data_root, mode="RGB").map(
-            applyTransform_to_tensor
+        ray_dataset = ray.data.read_images(args.data_root, mode="RGB").map_batches(
+           transformImage
         )
+
+        # ray_dataset = ray.data.read_images(args.data_root, mode="RGB").map(
+        #     applyTransform_to_tensor
+        # )
         # ray_dataset = ray_dataset.map()
         # .map(applyTransform_rnd_flip).map(applyTransform_rnd_color_jitter).map(applyTransform_rnd_gray).map(applyTransform_rnd_gaussian_blur)
 
