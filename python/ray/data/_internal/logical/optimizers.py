@@ -19,6 +19,9 @@ from ray.data._internal.logical.rules.set_read_parallelism import SetReadParalle
 from ray.data._internal.logical.rules.zero_copy_map_fusion import (
     EliminateBuildOutputBlocks,
 )
+'''Our Optimizing Rule'''
+from ray.data._internal.logical.rules.reorder_map_transforms import ReorderMapTransformDescendingRule
+
 from ray.data._internal.planner.planner import Planner
 
 DEFAULT_LOGICAL_RULES = [
@@ -30,6 +33,8 @@ DEFAULT_PHYSICAL_RULES = [
     SetReadParallelismRule,
     OperatorFusionRule,
     EliminateBuildOutputBlocks,
+    # My New Rule
+    ReorderMapTransformDescendingRule
 ]
 
 
@@ -59,7 +64,10 @@ def get_execution_plan(logical_plan: LogicalPlan) -> PhysicalPlan:
     (2) planning: convert logical to physical operators.
     (3) physical optimization: optimize physical operators.
     """
+    print(f"Logical Unoptimized DAG: {logical_plan.dag}\n")
     optimized_logical_plan = LogicalOptimizer().optimize(logical_plan)
     logical_plan._dag = optimized_logical_plan.dag
+    print(f"Logical Optimized DAG: {logical_plan.dag}\n")
     physical_plan = Planner().plan(optimized_logical_plan)
+    print(f"Physical Unoptimized DAG: {physical_plan.dag}\n")
     return PhysicalOptimizer().optimize(physical_plan)

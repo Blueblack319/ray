@@ -75,7 +75,9 @@ def execute_to_legacy_bundle_iterator(
     )
     if dag_rewrite:
         dag = dag_rewrite(dag)
-
+    print(f"In-Dependencies: {dag.input_dependencies}")
+    print(f"Out-Dependencies: {dag.output_dependencies}")
+    print(f"Post order iter: {dag.post_order_iter}")
     bundle_iter = executor.execute(dag, initial_stats=stats)
     return bundle_iter
 
@@ -173,6 +175,7 @@ def _get_execution_dag(
     # Get DAG of physical operators and input statistics.
     dag = get_execution_plan(plan._logical_plan).dag
     stats = _get_initial_stats_from_plan(plan)
+    print(f"Physical Optimized DAG: {dag}\n")
 
     # Enforce to preserve ordering if the plan has operators
     # required to do so, such as Zip and Sort.
